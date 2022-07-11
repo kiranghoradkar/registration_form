@@ -43,7 +43,8 @@ class DataBaseHelper {
     ${UserFields.designation} $textType,
     ${UserFields.address} $textType,
     ${UserFields.state} $textType,
-    ${UserFields.password} $textType)''');
+    ${UserFields.password} $textType,
+    ${UserFields.profilePic} BLOB)''');
   }
 
   Future<UserDetails> create(UserDetails userDetails) async {
@@ -54,7 +55,6 @@ class DataBaseHelper {
 
   Future<List<UserDetails>> readAllUser() async {
     final db = await instance.database;
-    // const orderBy ='${UserFields.id} ASC';
     final result = await db.query(userTable);
     List<UserDetails> list =
         result.map((json) => UserDetails.fromJson(json)).toList();

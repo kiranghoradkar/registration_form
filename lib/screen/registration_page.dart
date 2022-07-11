@@ -1,4 +1,8 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:registration_form/db/database_helper.dart';
 import 'package:registration_form/models/user_details.dart';
@@ -27,6 +31,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final ImagePicker picker = ImagePicker();
 
   XFile? image;
+
+  File? imgFile;
+
+  Uint8List? bytes;
+
+  Future<Uint8List?>? result;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,25 +55,57 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   ),
                   Stack(
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.all(14.0),
-                        child: CircleAvatar(
-                          radius: 50.0,
-                          backgroundColor: Colors.white,
-                          backgroundImage: AssetImage('assets/profile.png'),
-                        ),
+                      Padding(
+                        padding: const EdgeInsets.all(14.0),
+                        child: bytes != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(50),
+                                child: Image.memory(
+                                  bytes!,
+                                  width: 100.0,
+                                  height: 100.0,
+                                  fit: BoxFit.fitHeight,
+                                ),
+                              )
+                            : Container(
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                    color: Colors.grey[200],
+                                    border: Border.all(),
+                                    borderRadius: BorderRadius.circular(60)),
+                              ),
                       ),
                       Positioned(
-                        right: -10,
-                        top: 30,
-                        child: IconButton(
-                          onPressed: () async{
-                            image = await picker.pickImage(source: ImageSource.gallery);
+                        right: 0,
+                        top: 50,
+                        child: InkWell(
+                          child: Container(
+                              height: 30,
+                              width: 30,
+                              decoration: BoxDecoration(
+                                  color: Colors.grey[200],
+                                  border: Border.all(),
+                                  borderRadius: BorderRadius.circular(25)),
+                              child: const Icon(
+                                Icons.edit_outlined,
+                                size: 22,
+                              )),
+                          onTap: () async {
+                            image = await picker.pickImage(
+                                source: ImageSource.gallery);
+
+                            imgFile = File(image!.path);
+                            bytes = await FlutterImageCompress.compressWithFile(
+                              image!.path,
+                              minWidth: 1000,
+                              minHeight: 1000,
+                              quality: 80,
+                              rotate: 0,
+                            );
+
+                            setState(() {});
                           },
-                          icon: const Icon(
-                            Icons.edit_outlined,
-                            size: 28,
-                          ),
                         ),
                       ),
                     ],
@@ -141,32 +184,24 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         decoration: const BoxDecoration(color: Colors.blue),
                         child: TextButton(
                           onPressed: () {
-                            UserDetails userD =  UserDetails(firstName: firstC.text,
-                                lastName: lastC
-                                    .text,
+                            UserDetails userD = UserDetails(
+                                profilePic: bytes,
+                                firstName: firstC.text,
+                                lastName: lastC.text,
                                 phoneNumber: phoneC.text,
                                 emailAddress: emailC.text,
                                 password: passwordConfirmController.text,
-                            gender: _character.toString());
+                                gender: _character.toString());
 
                             if (formKey.currentState!.validate()) {
-                              // If the form is valid, display a snackbar. In the real world,
-                              // you'd often call a server or save the information in a database.
-                              // ScaffoldMessenger.of(context).showSnackBar(
-                              //   const SnackBar(content: Text('Processing Data')),
-                              // );
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => YourInfoPage(
-                                      userDetails: userD,
-                                    )),
+                                          userDetails: userD,
+                                        )),
                               );
                             }
-
-
-
-
 
                             // dbHelper.create(userD);
                           },

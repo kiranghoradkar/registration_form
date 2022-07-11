@@ -45,6 +45,18 @@ class _MyHomePageState extends State<MyHomePage> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              postMdl.userDetails![index].profilePic != null
+                                  ? Image.memory(
+                                      postMdl.userDetails![index].profilePic!,
+                                      width: 100,
+                                      height: 100,
+                                    )
+                                  : Container(
+                                      padding: const EdgeInsets.all(4),
+                                      width: 100,
+                                      height: 100,
+                                      child: Image.asset("assets/profile.png"),
+                                    ),
                               Text(
                                   "Name: ${postMdl.userDetails![index].firstName!} ${postMdl.userDetails![index].lastName!}"),
                               Text(

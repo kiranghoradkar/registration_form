@@ -1,7 +1,10 @@
+import 'dart:typed_data';
+
 const String userTable = "user";
 
 class UserFields {
   static final List<String> values = [
+    profilePic,
     id,
     firstName,
     lastName,
@@ -18,6 +21,7 @@ class UserFields {
     password
   ];
 
+  static const String profilePic = 'profilePic';
   static const String id = '_id';
   static const String firstName = 'firstName';
   static const String lastName = 'lastName';
@@ -35,6 +39,7 @@ class UserFields {
 }
 
 class UserDetails {
+  Uint8List? profilePic;
    int? id;
    String? firstName;
    String? lastName;
@@ -51,7 +56,8 @@ class UserDetails {
    String? password;
 
    UserDetails(
-      {this.id,
+      {this.profilePic,
+        this.id,
       this.firstName,
       this.lastName,
       this.phoneNumber,
@@ -67,6 +73,7 @@ class UserDetails {
         this.password,});
 
   static UserDetails fromJson(Map<String, Object?> json) => UserDetails(
+    profilePic: json[UserFields.profilePic] as Uint8List?,
     id: json[UserFields.id] as int,
     firstName: json[UserFields.firstName] as String?,
     lastName: json[UserFields.lastName] as String?,
@@ -84,6 +91,7 @@ class UserDetails {
   );
 
   Map<String, Object?> toJson() => {
+        UserFields.profilePic: profilePic,
         UserFields.id: id,
         UserFields.firstName: firstName,
         UserFields.lastName: lastName,
